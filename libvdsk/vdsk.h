@@ -41,9 +41,11 @@ int	vdsk_close(vdskctx);
 off_t	vdsk_capacity(vdskctx);
 int	vdsk_sectorsize(vdskctx);
 
-int	vdsk_readv(vdskctx, off_t, const struct iovec *, int);
-int	vdsk_writev(vdskctx, off_t, const struct iovec *, int);
-int	vdsk_trim(vdskctx, off_t, ssize_t);
-int	vdsk_flush(vdskctx);
+ssize_t	vdsk_readv(vdskctx, const struct iovec *, int, off_t);
+ssize_t	vdsk_read(vdskctx, void *, size_t, off_t);
+ssize_t	vdsk_writev(vdskctx, const struct iovec *, int, off_t);
+ssize_t	vdsk_write(vdskctx, void *, size_t, off_t);
+int	vdsk_trim(vdskctx, unsigned long, off_t arg[2]);
+int	vdsk_flush(vdskctx, unsigned long);
 
 #endif /* __VDSK_H__ */

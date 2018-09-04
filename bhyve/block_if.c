@@ -309,7 +309,7 @@ blockif_proc(struct blockif_ctxt *bc, struct blockif_elem *be, uint8_t *buf)
 		else if (bc->bc_ischr) {
 			arg[0] = br->br_offset;
 			arg[1] = br->br_resid;
-			if (ioctl(bc->bc_fd, DIOCGDELETE, arg))
+			if (vdsk_trim(bc, DIOCGDELETE, arg))
 				err = errno;
 			else
 				br->br_resid = 0;
