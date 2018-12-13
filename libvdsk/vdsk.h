@@ -1,5 +1,6 @@
 /*-
  * Copyright (c) 2014 Marcel Moolenaar
+ * Copyright (c) 2018 Marcelo Araujo <araujo@FreeBSD.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
