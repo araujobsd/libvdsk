@@ -4,15 +4,15 @@ LIB=	vdsk
 SHLIB_MAJOR= 0
 
 SRCS=	vdsk.c
-INCS=	vdsk.h
+INCS=	vdsk.h /usr/src/usr.sbin/bhyve/block_if.h
 
 # List of formats to support
 SRCS+=	\
-	qcow.c \
 	raw.c \
-	vhd.c \
-	vmdk.c
+	qcow.c
 
 DEBUG_FLAGS=-O0 -gdwarf-2
+
+WARNS?= 2
 
 .include <bsd.lib.mk>

@@ -51,10 +51,8 @@ struct vdsk_format {
 	int	(*probe)(struct vdsk *);
 	int	(*open)(struct vdsk *);
 	int	(*close)(struct vdsk *);
-	ssize_t	(*readv)(struct vdsk *, const struct iovec *, int, off_t);
-	ssize_t	(*read)(struct vdsk *, void *, size_t, off_t);
-	ssize_t	(*writev)(struct vdsk *, const struct iovec *, int, off_t);
-	ssize_t	(*write)(struct vdsk *, void *, size_t, off_t);
+	int	(*read)(struct vdsk *, struct blockif_req *, uint8_t *);
+	int	(*write)(struct vdsk *, struct blockif_req *, uint8_t *);
 	int	(*trim)(struct vdsk *, unsigned long, off_t arg[2]);
 	int	(*flush)(struct vdsk *, unsigned long);
 };
@@ -62,17 +60,69 @@ struct vdsk_format {
 SET_DECLARE(libvdsk_formats, struct vdsk_format);
 #define	FORMAT_DEFINE(nm)	DATA_SET(libvdsk_formats, nm)
 
+/* QCOW HEADER */
+struct qcheader {
+        char            magic[4];
+        uint32_t        version;
+        uint64_t        backingoff;
+        uint32_t        backingsz;
+        uint32_t        clustershift;
+        uint64_t        disksz;
+        /* v2 */
+        uint32_t        cryptmethod;
+        uint32_t        l1sz;
+        uint64_t        l1off;
+        uint64_t        refoff;
+        uint32_t        refsz;
+        uint32_t        snapcount;
+        uint64_t        snapsz;
+        /* v3 */
+        uint64_t        incompatfeatures;
+        uint64_t        compatfeatures;
+        uint64_t        autoclearfeatures;
+        uint32_t        reforder; /* Bits = 1 << reforder */
+        uint32_t        headersz;
+} __packed;
+
 /*
  * The internal representation of a "disk".
  */
 struct vdsk {
 	struct vdsk_format *fmt;
+	struct vdsk *base;
+	struct qcheader header;
 	int	fd;
 	int	fflags;
 	char	*filename;
 	struct stat fsbuf;
 	off_t	capacity;
 	int	sectorsize;
+
+	/* QCOW */
+        uint64_t        *l1;
+        char            *scratch;
+        off_t           end;
+        uint32_t        clustersz;
+        off_t           disksz; /* In bytes */
+        uint32_t        cryptmethod;
+
+        uint32_t        l1sz;
+        off_t           l1off;
+
+	uint32_t	l2sz;
+	off_t		l2off;
+
+        off_t           refoff;
+        uint32_t        refsz;
+
+        uint32_t        nsnap;
+        off_t           snapoff;
+
+        /* v3 */
+        uint64_t        incompatfeatures;
+        uint64_t        autoclearfeatures;
+        uint32_t        refssz;
+        uint32_t        headersz;
 } __attribute__((aligned(16)));
 
 #endif /* __VDSK_INT_H__ */
